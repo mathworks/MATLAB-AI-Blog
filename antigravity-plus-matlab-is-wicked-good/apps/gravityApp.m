@@ -1,0 +1,89 @@
+function gravityApp()
+    % GRAVITYAPP - Home screen for Gravity flight applications
+    % Displays a background image with navigation buttons to launch
+    % the Flight Simulator or Flight Dashboard.
+
+    % Create main figure
+    fig = uifigure('Name', 'Gravity - Home', ...
+                   'Position', [100 100 850 600], ...
+                   'Color', [0.1 0.1 0.15], ...
+                   'AutoResizeChildren', 'off', ...
+                   'Resize', 'on');
+
+    % Get paths
+    appDir = fileparts(mfilename('fullpath'));
+    distDir = fullfile(appDir, 'dist');
+    backgroundFile = fullfile(distDir, 'background.png');
+    iconFile = fullfile(distDir, 'broom.png');
+
+    % Set the app icon
+    fig.Icon = iconFile;
+
+    % Create background image
+    bgImage = uiimage(fig, 'Position', [0 0 fig.Position(3) fig.Position(4)]);
+    if isfile(backgroundFile)
+        bgImage.ImageSource = backgroundFile;
+    end
+    bgImage.ScaleMethod = 'fill';
+
+    % Create semi-transparent overlay panel for buttons
+    panelWidth = 300;
+    panelHeight = 200;
+    panelX = (fig.Position(3) - panelWidth) / 2;
+    panelY = (fig.Position(4) - panelHeight) / 2 - 50;
+
+    buttonPanel = uipanel(fig, ...
+        'Position', [panelX panelY panelWidth panelHeight], ...
+        'BackgroundColor', [0.1 0.1 0.2 0.85], ...
+        'BorderType', 'none');
+
+    % Title label
+    titleLabel = uilabel(buttonPanel, ...
+        'Text', 'Gravity', ...
+        'Position', [0 140 panelWidth 50], ...
+        'FontSize', 28, ...
+        'FontWeight', 'bold', ...
+        'FontColor', [1 1 1], ...
+        'HorizontalAlignment', 'center');
+
+    % Flight Simulator button
+    simButton = uibutton(buttonPanel, 'push', ...
+        'Text', 'Flight Simulator', ...
+        'Position', [50 80 200 40], ...
+        'FontSize', 14, ...
+        'FontWeight', 'bold', ...
+        'BackgroundColor', [0.2 0.5 0.8], ...
+        'FontColor', [1 1 1], ...
+        'ButtonPushedFcn', @(~,~) launchSimulator());
+
+    % Flight Dashboard button
+    dashButton = uibutton(buttonPanel, 'push', ...
+        'Text', 'Flight Dashboard', ...
+        'Position', [50 30 200 40], ...
+        'FontSize', 14, ...
+        'FontWeight', 'bold', ...
+        'BackgroundColor', [0.6 0.3 0.7], ...
+        'FontColor', [1 1 1], ...
+        'ButtonPushedFcn', @(~,~) launchDashboard());
+
+    % Handle figure resize
+    fig.SizeChangedFcn = @(~,~) onResize();
+
+    function onResize()
+        % Resize background to fill figure
+        bgImage.Position = [0 0 fig.Position(3) fig.Position(4)];
+
+        % Center the button panel
+        panelX = (fig.Position(3) - panelWidth) / 2;
+        panelY = (fig.Position(4) - panelHeight) / 2 - 50;
+        buttonPanel.Position = [panelX panelY panelWidth panelHeight];
+    end
+
+    function launchSimulator()
+        gravityFlightSimulator();
+    end
+
+    function launchDashboard()
+        gravityFlightDashboard();
+    end
+end
